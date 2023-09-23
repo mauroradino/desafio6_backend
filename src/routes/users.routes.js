@@ -4,7 +4,9 @@ import { userModel } from "../models/userModel.js";
 const usersRouter = Router()
 
 usersRouter.post('/register', async (req, res) =>{
-    const { first_name, last_name, email, age, password } = req.body;
+    const { email, password } = req.body;
+    console.log(email)
+    console.log(password)
 
     try{
         const respuesta = await userModel.create({ first_name, last_name, age, email, password })
