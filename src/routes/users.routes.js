@@ -13,23 +13,5 @@ usersRouter.post('/register', async (req, res) =>{
         res.status(400).send(error)
     }
 })
-usersRouter.get('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try{
-        const respuesta = await userModel.findOne({email: email})
-        if(respuesta === null){
-            res.status(404).send("Usuario no encontrado")
-        }else{
-            if(respuesta.password === password){
-                res.send("Logueado Correctamente")
-            }
-            else{
-                res.send("Contraseña incorrecta")
-            }
-        }
 
-    }catch(error){
-        res.status(400).send(error)
-    } 
-})
 export default usersRouter;

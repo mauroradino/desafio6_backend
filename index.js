@@ -6,6 +6,7 @@ import { engine } from 'express-handlebars'
 import _dirname from './path.js';
 import 'dotenv/config'
 import usersRouter from "./src/routes/users.routes.js";
+import sessionRouter from './src/routes/session.routes.js';
 import path from 'path'
 import mongoose from 'mongoose';
 
@@ -20,15 +21,6 @@ mongoose.connect(process.env.MONGOURL)
 })
 .catch((error)=> console.log(error))
 
-app.use(Express.json())
-app.engine('handlebars', engine())
-app.set('views', _dirname + 'views');
-app.set('views', path.resolve(_dirname, './src/views'))
-app.set('view engine', 'handlebars')
-app.use('/register', Express.static(path.join(_dirname, './src/public'))) //Unir rutas en una sola concatenandolas
-app.use('/login', Express.static(path.join(_dirname, './src/public'))) //Unir rutas en una sola concatenandolas
-app.use('/users', usersRouter)
-app.use(cookieParser(process.env.COOKIE_CODE))
 app.use(session({
     store: MongoStore.create({
         mongoUrl: process.env.MONGOURL,
@@ -36,13 +28,26 @@ app.use(session({
             useNewUrlParser: true, //Establezco que la conexion sea mediante URL
             useUnifiedTopology: true //Manego de clusters de manera dinamica
         },
-        ttl: 60 //Duracion de la sesion en la BDD en segundos
+        ttl: 30 //Duracion de la sesion en la BDD en segundos
 
     }),
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_CODE,
     resave: false, //Fuerzo a que se intente guardar a pesar de no tener modificacion en los datos
     saveUninitialized: false //Fuerzo a guardar la session a pesar de no tener ningun dato
 }))
+
+
+app.use(Express.json())
+app.engine('handlebars', engine())
+app.set('views', _dirname + 'views');
+app.set('views', path.resolve(_dirname, './src/views'))
+app.set('view engine', 'handlebars')
+app.use('/register', Express.static(path.join(_dirname, './src/public'))) //Unir rutas en una sola concatenandolas
+app.use('/login', Express.static(path.join(_dirname, './src/public'))) //Unir rutas en una sola concatenandolas
+app.use('/api/users', usersRouter)
+app.use('/api/session', sessionRouter)
+app.use(cookieParser(process.env.COOKIE_CODE))
+
 
 app.get('/register', (req, res) => {
     const { email, password } = req.body
